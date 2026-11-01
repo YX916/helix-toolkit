@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -6,20 +6,16 @@ using System.Windows.Input;
 
 namespace HelixToolkit.Wpf.SharpDX.Controls;
 
-public class WinformHostExtend : WindowsFormsHost
-{
+public class WinformHostExtend : WindowsFormsHost {
     public delegate void FormMouseMoveEventHandler(object? sender, FormMouseMoveEventArgs e);
     public static readonly RoutedEvent FormMouseMoveEvent =
         EventManager.RegisterRoutedEvent("FormMouseMove", RoutingStrategy.Bubble, typeof(FormMouseMoveEventHandler), typeof(WinformHostExtend));
 
-    public event FormMouseMoveEventHandler FormMouseMove
-    {
-        add
-        {
+    public event FormMouseMoveEventHandler FormMouseMove {
+        add {
             this.AddHandler(FormMouseMoveEvent, value);
         }
-        remove
-        {
+        remove {
             this.RemoveHandler(FormMouseMoveEvent, value);
         }
     }
@@ -27,29 +23,22 @@ public class WinformHostExtend : WindowsFormsHost
     public static readonly RoutedEvent FormMouseWheelEvent =
         EventManager.RegisterRoutedEvent("FormMouseWheel", RoutingStrategy.Bubble, typeof(FormMouseWheelEventHandler), typeof(WinformHostExtend));
 
-    public event FormMouseWheelEventHandler FormMouseWheel
-    {
-        add
-        {
+    public event FormMouseWheelEventHandler FormMouseWheel {
+        add {
             this.AddHandler(FormMouseWheelEvent, value);
         }
-        remove
-        {
+        remove {
             this.RemoveHandler(FormMouseWheelEvent, value);
         }
     }
-    protected UIElement? ParentControl
-    {
+    protected UIElement? ParentControl {
         set; get;
     }
 
     private double dpiScale = 1;
-    public double DpiScale
-    {
-        set
-        {
-            if (dpiScale == value)
-            {
+    public double DpiScale {
+        set {
+            if (dpiScale == value) {
                 return;
             }
             dpiScale = value;
@@ -60,23 +49,19 @@ public class WinformHostExtend : WindowsFormsHost
 
     public event EventHandler<double>? DpiScaleChanged;
 
-    public WinformHostExtend()
-    {
+    public WinformHostExtend() {
         ChildChanged += OnChildChanged;
     }
 
-    private void OnChildChanged(object? sender, ChildChangedEventArgs childChangedEventArgs)
-    {
-        if (childChangedEventArgs.PreviousChild is Control previousChild)
-        {
+    private void OnChildChanged(object? sender, ChildChangedEventArgs childChangedEventArgs) {
+        if (childChangedEventArgs.PreviousChild is Control previousChild) {
             previousChild.MouseDown -= OnMouseDown;
             previousChild.MouseWheel -= OnMouseWheel;
             previousChild.MouseMove -= OnMouseMove;
             previousChild.MouseUp -= OnMouseUp;
         }
 
-        if (Child != null)
-        {
+        if (Child != null) {
             Child.MouseDown += OnMouseDown;
             Child.MouseWheel += OnMouseWheel;
             Child.MouseMove += OnMouseMove;
@@ -84,45 +69,38 @@ public class WinformHostExtend : WindowsFormsHost
         }
     }
 
-    private void OnMouseMove(object? sender, System.Windows.Forms.MouseEventArgs e)
-    {
+    private void OnMouseMove(object? sender, System.Windows.Forms.MouseEventArgs e) {
         RaiseEvent(new FormMouseMoveEventArgs(FormMouseMoveEvent, new Point(e.Location.X / DpiScale, e.Location.Y / DpiScale), e.X, e.Y, e.Delta) { Source = this });
     }
 
-    private void OnMouseWheel(object? sender, System.Windows.Forms.MouseEventArgs e)
-    {
-        RaiseEvent(new FormMouseWheelEventArgs(FormMouseWheelEvent, Mouse.PrimaryDevice, Environment.TickCount, e.Delta)
-        {
+    private void OnMouseWheel(object? sender, System.Windows.Forms.MouseEventArgs e) {
+        var location = new Point(e.Location.X / DpiScale, e.Location.Y / DpiScale);
+        RaiseEvent(new FormMouseWheelEventArgs(FormMouseWheelEvent, Mouse.PrimaryDevice, Environment.TickCount, e.Delta, location) {
             Source = this,
         });
     }
 
-    private void OnMouseDown(object? sender, System.Windows.Forms.MouseEventArgs mouseEventArgs)
-    {
+    private void OnMouseDown(object? sender, System.Windows.Forms.MouseEventArgs mouseEventArgs) {
         var wpfButton = ConvertToWpf(mouseEventArgs.Button);
         if (!wpfButton.HasValue)
             return;
         Capture();
-        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value)
-        {
+        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value) {
             RoutedEvent = Mouse.PreviewMouseDownEvent,
             Source = this,
         });
 
-        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value)
-        {
+        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value) {
             RoutedEvent = Mouse.MouseDownEvent,
             Source = this,
         });
     }
-    private void OnMouseUp(object? sender, System.Windows.Forms.MouseEventArgs mouseEventArgs)
-    {
+    private void OnMouseUp(object? sender, System.Windows.Forms.MouseEventArgs mouseEventArgs) {
         var wpfButton = ConvertToWpf(mouseEventArgs.Button);
         if (!wpfButton.HasValue)
             return;
         Capture();
-        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value)
-        {
+        RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, wpfButton.Value) {
             RoutedEvent = Mouse.MouseUpEvent,
             Source = this,
         });
@@ -132,16 +110,13 @@ public class WinformHostExtend : WindowsFormsHost
     /// Has to do this, otherwise the mouse point is wrong in mouse event.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void Capture()
-    {
+    private void Capture() {
         this.CaptureMouse();
         this.ReleaseMouseCapture();
     }
 
-    private MouseButton? ConvertToWpf(MouseButtons winformButton)
-    {
-        return winformButton switch
-        {
+    private MouseButton? ConvertToWpf(MouseButtons winformButton) {
+        return winformButton switch {
             MouseButtons.Left => (MouseButton?)MouseButton.Left,
             MouseButtons.None => null,
             MouseButtons.Right => (MouseButton?)MouseButton.Right,
@@ -155,8 +130,7 @@ public class WinformHostExtend : WindowsFormsHost
     /// 
     /// </summary>
     /// <seealso cref="System.Windows.RoutedEventArgs" />
-    public sealed class FormMouseMoveEventArgs : RoutedEventArgs
-    {
+    public sealed class FormMouseMoveEventArgs : RoutedEventArgs {
         //
         // Summary:
         //     Gets a signed count of the number of detents the mouse wheel has rotated, multiplied
@@ -165,8 +139,7 @@ public class WinformHostExtend : WindowsFormsHost
         // Returns:
         //     A signed count of the number of detents the mouse wheel has rotated, multiplied
         //     by the WHEEL_DELTA constant.
-        public int Delta
-        {
+        public int Delta {
             get; private set;
         }
         //
@@ -176,8 +149,7 @@ public class WinformHostExtend : WindowsFormsHost
         // Returns:
         //     A System.Drawing.Point that contains the x- and y- mouse coordinates, in pixels,
         //     relative to the upper-left corner of the form.
-        public Point Location
-        {
+        public Point Location {
             get; private set;
         }
         //
@@ -186,8 +158,7 @@ public class WinformHostExtend : WindowsFormsHost
         //
         // Returns:
         //     The x-coordinate of the mouse, in pixels.
-        public int X
-        {
+        public int X {
             get; private set;
         }
         //
@@ -196,8 +167,7 @@ public class WinformHostExtend : WindowsFormsHost
         //
         // Returns:
         //     The y-coordinate of the mouse, in pixels.
-        public int Y
-        {
+        public int Y {
             get; private set;
         }
         /// <summary>
@@ -209,8 +179,7 @@ public class WinformHostExtend : WindowsFormsHost
         /// <param name="y">The y.</param>
         /// <param name="delta">The delta.</param>
         public FormMouseMoveEventArgs(RoutedEvent routedEvent, Point p, int x, int y, int delta)
-            : base(routedEvent)
-        {
+            : base(routedEvent) {
             Location = p;
             X = x;
             Y = y;
@@ -221,11 +190,12 @@ public class WinformHostExtend : WindowsFormsHost
     /// 
     /// </summary>
     /// <seealso cref="System.Windows.Input.MouseWheelEventArgs" />
-    public sealed class FormMouseWheelEventArgs : RoutedEventArgs
-    {
+    public sealed class FormMouseWheelEventArgs : RoutedEventArgs {
         public readonly int Delta;
         public readonly int Timestamp;
         public readonly MouseDevice Mouse;
+
+        public Point Location { get; }
         /// <summary>
         /// Initializes a new instance of the <see cref="FormMouseWheelEventArgs"/> class.
         /// </summary>
@@ -233,15 +203,15 @@ public class WinformHostExtend : WindowsFormsHost
         /// <param name="mouse">The mouse device associated with this event.</param>
         /// <param name="timestamp">The time when the input occurred.</param>
         /// <param name="delta">The amount the wheel has changed.</param>
-        public FormMouseWheelEventArgs(RoutedEvent routedEvent, MouseDevice mouse, int timestamp, int delta) : base(routedEvent)
-        {
+        /// <param name="location">The location of the mouse.</param>
+        public FormMouseWheelEventArgs(RoutedEvent routedEvent, MouseDevice mouse, int timestamp, int delta, Point location) : base(routedEvent) {
             Delta = delta;
             Timestamp = timestamp;
             Mouse = mouse;
+            Location = location;
         }
 
-        public static implicit operator MouseWheelEventArgs(FormMouseWheelEventArgs args)
-        {
+        public static implicit operator MouseWheelEventArgs(FormMouseWheelEventArgs args) {
             return new MouseWheelEventArgs(args.Mouse, args.Timestamp, args.Delta) { RoutedEvent = MouseWheelEvent };
         }
     }
