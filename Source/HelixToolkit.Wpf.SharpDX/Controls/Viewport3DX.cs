@@ -1,4 +1,4 @@
-﻿using HelixToolkit.SharpDX;
+using HelixToolkit.SharpDX;
 using HelixToolkit.SharpDX.Cameras;
 using HelixToolkit.SharpDX.Model.Scene;
 using HelixToolkit.SharpDX.Model.Scene2D;
@@ -56,12 +56,9 @@ namespace HelixToolkit.Wpf.SharpDX;
 [TemplatePart(Name = ViewportPartNames.PartItems, Type = typeof(ItemsControl))]
 [Localizability(LocalizationCategory.NeverLocalize)]
 #endif
-public partial class Viewport3DX : Control, IViewport3DX
-{
-    public static bool IsInDesignMode
-    {
-        get
-        {
+public partial class Viewport3DX : Control, IViewport3DX {
+    public static bool IsInDesignMode {
+        get {
 #if WINUI
             return DesignMode.DesignModeEnabled;
 #else
@@ -128,21 +125,15 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <para>Return enumerable of all the rederable elements</para>
     /// <para>If enabled shared model mode, the returned rederables are current viewport renderable plus shared models</para>
     /// </summary>
-    public IEnumerable<SceneNode> Renderables
-    {
-        get
-        {
-            foreach (Element3D item in Items)
-            {
+    public IEnumerable<SceneNode> Renderables {
+        get {
+            foreach (Element3D item in Items) {
                 yield return item.SceneNode;
             }
 
-            if (renderHostInternal is not null && renderHostInternal.EnableSharingModelMode && renderHostInternal.SharedModelContainer is not null)
-            {
-                foreach (var item in renderHostInternal.SharedModelContainer.Renderables)
-                {
-                    if (item is null)
-                    {
+            if (renderHostInternal is not null && renderHostInternal.EnableSharingModelMode && renderHostInternal.SharedModelContainer is not null) {
+                foreach (var item in renderHostInternal.SharedModelContainer.Renderables) {
+                    if (item is null) {
                         continue;
                     }
 
@@ -150,36 +141,28 @@ public partial class Viewport3DX : Control, IViewport3DX
                 }
             }
 
-            if (viewCube is not null)
-            {
+            if (viewCube is not null) {
                 yield return viewCube.SceneNode;
             }
 
-            if (coordinateView is not null)
-            {
+            if (coordinateView is not null) {
                 yield return coordinateView.SceneNode;
             }
         }
     }
 
-    private IEnumerable<SceneNode> OwnedRenderables
-    {
-        get
-        {
-            if (renderHostInternal != null)
-            {
-                foreach (Element3D item in Items)
-                {
+    private IEnumerable<SceneNode> OwnedRenderables {
+        get {
+            if (renderHostInternal != null) {
+                foreach (Element3D item in Items) {
                     yield return item.SceneNode;
                 }
 
-                if (viewCube is not null)
-                {
+                if (viewCube is not null) {
                     yield return viewCube.SceneNode;
                 }
 
-                if (coordinateView is not null)
-                {
+                if (coordinateView is not null) {
                     yield return coordinateView.SceneNode;
                 }
             }
@@ -192,14 +175,11 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <value>
     /// The d2d renderables.
     /// </value>
-    public IEnumerable<SceneNode2D> D2DRenderables
-    {
-        get
-        {
+    public IEnumerable<SceneNode2D> D2DRenderables {
+        get {
             yield return Overlay2D.SceneNode;
 
-            if (frameStatisticModel is not null)
-            {
+            if (frameStatisticModel is not null) {
                 yield return frameStatisticModel.SceneNode;
             }
         }
@@ -218,12 +198,9 @@ public partial class Viewport3DX : Control, IViewport3DX
     private HitTest2DResult? currentHit2D;
 
     private Element2D? mouseOverModel2D;
-    public Element2D? MouseOverModel2D
-    {
-        private set
-        {
-            if (mouseOverModel2D == value)
-            {
+    public Element2D? MouseOverModel2D {
+        private set {
+            if (mouseOverModel2D == value) {
                 return;
             }
 
@@ -231,8 +208,7 @@ public partial class Viewport3DX : Control, IViewport3DX
             mouseOverModel2D = value;
             mouseOverModel2D?.RaiseEvent(new Mouse2DEventArgs(Element2D.MouseEnter2DEvent, mouseOverModel2D, this));
         }
-        get
-        {
+        get {
             return mouseOverModel2D;
         }
     }
@@ -329,8 +305,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Initializes static members of the <see cref="Viewport3DX" /> class.
     /// </summary>
-    static Viewport3DX()
-    {
+    static Viewport3DX() {
         DefaultStyleKeyProperty.OverrideMetadata(
             typeof(Viewport3DX), new FrameworkPropertyMetadata(typeof(Viewport3DX)));
     }
@@ -339,8 +314,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Initializes a new instance of the <see cref="Viewport3DX" /> class.
     /// </summary>
-    public Viewport3DX()
-    {
+    public Viewport3DX() {
 #if WINUI
         this.DefaultStyleKey = typeof(Viewport3DX);
 #endif
@@ -364,18 +338,15 @@ public partial class Viewport3DX : Control, IViewport3DX
         this.Unloaded += this.ControlUnloaded;
 
 #if WPF
-        this.IsVisibleChanged += (d, e) =>
-        {
-            if (renderHostInternal != null)
-            {
+        this.IsVisibleChanged += (d, e) => {
+            if (renderHostInternal != null) {
                 renderHostInternal.IsRendering = (bool)e.NewValue;
             }
         };
 #endif
     }
 
-    private void SetupBindings()
-    {
+    private void SetupBindings() {
 #if WINUI
         var binding = new Binding() { Source = this, Path = new PropertyPath("ShowViewCube") };
         BindingOperations.SetBinding(viewCube, ViewBoxModel3D.IsRenderingProperty, binding);
@@ -432,8 +403,7 @@ public partial class Viewport3DX : Control, IViewport3DX
 #endif
     }
 
-    private void InitCameraController()
-    {
+    private void InitCameraController() {
         #region Assign Defaults
         this.cameraController.ActualCamera = this.Camera;
         this.cameraController.DefaultCamera = this.DefaultCamera;
@@ -476,27 +446,20 @@ public partial class Viewport3DX : Control, IViewport3DX
         #endregion
     }
 
-    private void Items_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        if (e.OldItems != null)
-        {
-            foreach (var item in e.OldItems)
-            {
+    private void Items_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        if (e.OldItems != null) {
+            foreach (var item in e.OldItems) {
                 partItemsControl?.Items.Remove(item);
-                if (item is Element3D element)
-                {
+                if (item is Element3D element) {
                     element.SceneNode.Invalidated -= NodeInvalidated;
                     element.SceneNode.Detach();
                 }
             }
         }
-        if (e.NewItems != null)
-        {
-            foreach (var item in e.NewItems)
-            {
+        if (e.NewItems != null) {
+            foreach (var item in e.NewItems) {
                 partItemsControl?.Items.Add(item);
-                if (this.IsAttached && item is Element3D element)
-                {
+                if (this.IsAttached && item is Element3D element) {
                     element.SceneNode.Invalidated += NodeInvalidated;
                     element.SceneNode.Attach(EffectsManager);
                 }
@@ -517,8 +480,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="dz">
     /// The delta z. 
     /// </param>
-    public void AddMoveForce(double dx, double dy, double dz)
-    {
+    public void AddMoveForce(double dx, double dy, double dz) {
         this.cameraController.AddMoveForce(new Vector3((float)dx, (float)dy, (float)dz));
     }
 
@@ -528,8 +490,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="delta">
     /// The delta. 
     /// </param>
-    public void AddMoveForce(Vector3D delta)
-    {
+    public void AddMoveForce(Vector3D delta) {
         this.cameraController.AddMoveForce(delta.ToVector3());
     }
 
@@ -542,8 +503,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="dy">
     /// The delta y. 
     /// </param>
-    public void AddPanForce(double dx, double dy)
-    {
+    public void AddPanForce(double dx, double dy) {
         this.cameraController.AddPanForce((float)dx, (float)dy);
     }
 
@@ -553,8 +513,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="pan">
     /// The pan. 
     /// </param>
-    public void AddPanForce(Vector3D pan)
-    {
+    public void AddPanForce(Vector3D pan) {
         this.cameraController.AddPanForce(pan.ToVector3());
     }
 
@@ -567,8 +526,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="dy">
     /// The delta y. 
     /// </param>
-    public void AddRotateForce(double dx, double dy)
-    {
+    public void AddRotateForce(double dx, double dy) {
         this.cameraController.AddRotateForce((float)dx, (float)dy);
     }
 
@@ -578,8 +536,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="dx">
     /// The delta. 
     /// </param>
-    public void AddZoomForce(double dx)
-    {
+    public void AddZoomForce(double dx) {
         this.cameraController.AddZoomForce((float)dx);
     }
 
@@ -592,8 +549,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="zoomOrigin">
     /// The zoom origin. 
     /// </param>
-    public void AddZoomForce(double dx, Point3D zoomOrigin)
-    {
+    public void AddZoomForce(double dx, Point3D zoomOrigin) {
         this.cameraController.AddZoomForce((float)dx, zoomOrigin.ToVector3());
     }
 
@@ -609,8 +565,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time. 
     /// </param>
-    public void ChangeDirection(Vector3D lookDir, Vector3D upDir, double animationTime = 500)
-    {
+    public void ChangeDirection(Vector3D lookDir, Vector3D upDir, double animationTime = 500) {
         this.cameraController.ChangeDirection(lookDir, upDir, animationTime);
     }
 
@@ -623,28 +578,23 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <returns>
     /// A Point3D or null.
     /// </returns>
-    public Point3D? FindNearestPoint(Point pt)
-    {
+    public Point3D? FindNearestPoint(Point pt) {
         return ViewportExtensions.FindNearestPoint(this, pt);
     }
 
     /// <summary>
     /// Hides the target adorner.
     /// </summary>
-    public void HideTargetAdorner()
-    {
-        if (this.hostPresenter is not Visual visual)
-        {
+    public void HideTargetAdorner() {
+        if (this.hostPresenter is not Visual visual) {
             return;
         }
 
         var myAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-        if (myAdornerLayer == null)
-        {
+        if (myAdornerLayer == null) {
             return;
         }
-        if (this.targetAdorner != null)
-        {
+        if (this.targetAdorner != null) {
             myAdornerLayer.Remove(this.targetAdorner);
         }
 
@@ -656,20 +606,16 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Hides the zoom rectangle.
     /// </summary>
-    public void HideZoomRectangle()
-    {
-        if (this.hostPresenter is not Visual visual)
-        {
+    public void HideZoomRectangle() {
+        if (this.hostPresenter is not Visual visual) {
             return;
         }
 
         var myAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-        if (myAdornerLayer == null)
-        {
+        if (myAdornerLayer == null) {
             return;
         }
-        if (this.rectangleAdorner != null)
-        {
+        if (this.rectangleAdorner != null) {
             myAdornerLayer.Remove(this.rectangleAdorner);
         }
 
@@ -682,8 +628,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Tries to invalidate the current render.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void InvalidateRender()
-    {
+    public void InvalidateRender() {
         renderHostInternal?.InvalidateRender();
     }
 
@@ -691,8 +636,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Invalidates the scene graph.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void InvalidateSceneGraph()
-    {
+    public void InvalidateSceneGraph() {
         renderHostInternal?.InvalidateSceneGraph();
     }
 
@@ -702,8 +646,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="p">
     /// The point.
     /// </param>
-    public void LookAt(Point3D p)
-    {
+    public void LookAt(Point3D p) {
         this.cameraController.ActualCamera?.LookAt(p, 0);
     }
 
@@ -716,8 +659,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    public void LookAt(Point3D p, double animationTime)
-    {
+    public void LookAt(Point3D p, double animationTime) {
         this.cameraController.ActualCamera?.LookAt(p, animationTime);
     }
 
@@ -733,8 +675,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    public void LookAt(Point3D p, double distance, double animationTime)
-    {
+    public void LookAt(Point3D p, double distance, double animationTime) {
         this.cameraController.ActualCamera?.LookAt(p, distance, animationTime);
     }
 
@@ -750,8 +691,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    public void LookAt(Point3D p, Vector3D direction, double animationTime)
-    {
+    public void LookAt(Point3D p, Vector3D direction, double animationTime) {
         this.cameraController.ActualCamera?.LookAt(p, direction, animationTime);
     }
 
@@ -760,57 +700,46 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.
     /// </summary>
     /// <exception cref="HelixToolkitException">{0} is missing from the template.</exception>
-    public override void OnApplyTemplate()
-    {
+    public override void OnApplyTemplate() {
         base.OnApplyTemplate();
-        if (IsInDesignMode && !EnableDesignModeRendering)
-        {
+        if (IsInDesignMode && !EnableDesignModeRendering) {
             return;
         }
         Disposer.RemoveAndDispose(ref renderHostInternal);
         hostPresenter = this.GetTemplateChild(ViewportPartNames.PartCanvas) as ContentPresenter;
 
-        if (this.hostPresenter?.Content is IRenderCanvas renderCanvas)
-        {
+        if (this.hostPresenter?.Content is IRenderCanvas renderCanvas) {
             renderCanvas.ExceptionOccurred -= this.HandleRenderException;
         }
 
         var source = PresentationSource.FromVisual(this);
-        if (source != null)
-        {
+        if (source != null) {
             DpiScale = Math.Max(DpiScale, Math.Max(source.CompositionTarget.TransformToDevice.M11, source.CompositionTarget.TransformToDevice.M22));
         }
 
-        if (hostPresenter is not null)
-        {
-            if (EnableSwapChainRendering)
-            {
+        if (hostPresenter is not null) {
+            if (EnableSwapChainRendering) {
                 hostPresenter.Content = new DPFSurfaceSwapChain(EnableDeferredRendering, BelongsToParentWindow) { DpiScale = DpiScale };
-            }
-            else
-            {
+            } else {
                 hostPresenter.Content = new DPFCanvas(EnableDeferredRendering, BelongsToParentWindow) { DpiScale = DpiScale };
             }
         }
 
-        if (this.renderHostInternal != null)
-        {
+        if (this.renderHostInternal != null) {
             this.renderHostInternal.Rendered -= this.RaiseRenderHostRendered;
             this.renderHostInternal.ExceptionOccurred -= this.HandleRenderException;
         }
 
         Disposer.RemoveAndDispose(ref renderHostInternal);
 
-        if (this.hostPresenter is not null)
-        {
+        if (this.hostPresenter is not null) {
             renderCanvas = (IRenderCanvas)this.hostPresenter.Content;
             renderCanvas.EnableDpiScale = EnableDpiScale;
             this.renderHostInternal = renderCanvas.RenderHost;
             renderCanvas.ExceptionOccurred += this.HandleRenderException;
         }
 
-        if (this.renderHostInternal != null)
-        {
+        if (this.renderHostInternal != null) {
             this.renderHostInternal.Rendered += this.RaiseRenderHostRendered;
             this.renderHostInternal.ExceptionOccurred += this.HandleRenderException;
             this.renderHostInternal.ClearColor = BackgroundColor.ToColor4();
@@ -838,68 +767,48 @@ public partial class Viewport3DX : Control, IViewport3DX
             this.renderHostInternal.RenderConfiguration.SSAOQuality = SSAOQuality;
             this.renderHostInternal.RenderConfiguration.MinimumUpdateCount = (uint)Math.Max(0, MinimumUpdateCount);
 
-            if (ShowFrameRate)
-            {
+            if (ShowFrameRate) {
                 this.renderHostInternal.ShowRenderDetail |= RenderDetail.FPS;
-            }
-            else
-            {
+            } else {
                 this.renderHostInternal.ShowRenderDetail &= ~RenderDetail.FPS;
             }
-            if (ShowFrameDetails)
-            {
+            if (ShowFrameDetails) {
                 this.renderHostInternal.ShowRenderDetail |= RenderDetail.Statistics;
-            }
-            else
-            {
+            } else {
                 this.renderHostInternal.ShowRenderDetail &= ~RenderDetail.Statistics;
             }
-            if (ShowTriangleCountInfo)
-            {
+            if (ShowTriangleCountInfo) {
                 this.renderHostInternal.ShowRenderDetail |= RenderDetail.TriangleInfo;
-            }
-            else
-            {
+            } else {
                 this.renderHostInternal.ShowRenderDetail &= ~RenderDetail.TriangleInfo;
             }
-            if (ShowCameraInfo)
-            {
+            if (ShowCameraInfo) {
                 this.renderHostInternal.ShowRenderDetail |= RenderDetail.Camera;
-            }
-            else
-            {
+            } else {
                 this.renderHostInternal.ShowRenderDetail &= ~RenderDetail.Camera;
             }
         }
 
         this.coordinateView ??= GetTemplateChild(ViewportPartNames.PartCoordinateView) as ScreenSpacedElement3D;
-        if (this.coordinateView == null)
-        {
+        if (this.coordinateView == null) {
             throw new HelixToolkitException("{0} is missing from the template.", ViewportPartNames.PartCoordinateView);
         }
         this.viewCube ??= GetTemplateChild(ViewportPartNames.PartViewCube) as ScreenSpacedElement3D;
-        if (this.viewCube == null)
-        {
+        if (this.viewCube == null) {
             throw new HelixToolkitException("{0} is missing from the template.", ViewportPartNames.PartViewCube);
         }
         this.frameStatisticModel ??= GetTemplateChild(ViewportPartNames.PartFrameStatisticView) as FrameStatisticsModel2D;
-        if (this.frameStatisticModel == null)
-        {
+        if (this.frameStatisticModel == null) {
             throw new HelixToolkitException("{0} is missing from the template.", ViewportPartNames.PartFrameStatisticView);
         }
         this.partItemsControl ??= GetTemplateChild(ViewportPartNames.PartItems) as ItemsControl;
-        if (this.partItemsControl == null)
-        {
+        if (this.partItemsControl == null) {
             throw new HelixToolkitException("{0} is missing from the template.", ViewportPartNames.PartItems);
-        }
-        else
-        {
-            foreach (var item in Items)
-            {
+        } else {
+            foreach (var item in Items) {
                 this.partItemsControl.Items.Remove(item);
             }
-            foreach (var item in Items)
-            {
+            foreach (var item in Items) {
                 this.partItemsControl.Items.Add(item);
             }
         }
@@ -907,20 +816,16 @@ public partial class Viewport3DX : Control, IViewport3DX
         this.RemoveLogicalChild(Overlay2D);
         this.AddLogicalChild(Overlay2D);
         var titleView = GetTemplateChild(ViewportPartNames.PartTitleView);
-        if (titleView is Element2D element)
-        {
+        if (titleView is Element2D element) {
             Overlay2D.Children.Add(element);
         }
-        if (viewCube != null)
-        {
+        if (viewCube != null) {
             Overlay2D.Children.Add(viewCube.MoverCanvas);
         }
-        if (coordinateView != null)
-        {
+        if (coordinateView != null) {
             Overlay2D.Children.Add(coordinateView.MoverCanvas);
         }
-        if (Content2D != null)
-        {
+        if (Content2D != null) {
             Overlay2D.Children.Add(Content2D);
         }
 
@@ -930,22 +835,16 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Resets the view.
     /// </summary>
-    public void Reset()
-    {
-        if (!this.IsZoomEnabled || !this.IsRotationEnabled || !this.IsPanEnabled)
-        {
+    public void Reset() {
+        if (!this.IsZoomEnabled || !this.IsRotationEnabled || !this.IsPanEnabled) {
             return;
         }
 
-        if (this.DefaultCamera != null)
-        {
-            if (this.Camera is not null)
-            {
+        if (this.DefaultCamera != null) {
+            if (this.Camera is not null) {
                 this.DefaultCamera.CopyTo(this.Camera);
             }
-        }
-        else
-        {
+        } else {
             this.Camera?.Reset();
             this.ZoomExtents();
         }
@@ -966,8 +865,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    public void SetView(Point3D newPosition, Vector3D newDirection, Vector3D newUpDirection, double animationTime)
-    {
+    public void SetView(Point3D newPosition, Vector3D newDirection, Vector3D newUpDirection, double animationTime) {
         Camera?.AnimateTo(newPosition, newDirection, newUpDirection, animationTime);
     }
 
@@ -976,26 +874,21 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Shows the target adorner.
     /// </summary>
     /// <param name="position">The position.</param>
-    public void ShowTargetAdorner(Point position)
-    {
-        if (!this.ShowCameraTarget)
-        {
+    public void ShowTargetAdorner(Point position) {
+        if (!this.ShowCameraTarget) {
             return;
         }
 
-        if (this.targetAdorner != null)
-        {
+        if (this.targetAdorner != null) {
             return;
         }
 
-        if (this.hostPresenter is not UIElement visual)
-        {
+        if (this.hostPresenter is not UIElement visual) {
             return;
         }
 
         var myAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-        if (myAdornerLayer == null)
-        {
+        if (myAdornerLayer == null) {
             return;
         }
         this.targetAdorner = new TargetSymbolAdorner(visual, position);
@@ -1006,22 +899,18 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Shows the zoom rectangle.
     /// </summary>
     /// <param name="rect">The zoom rectangle.</param>
-    public void ShowZoomRectangle(Rect rect)
-    {
-        if (this.rectangleAdorner != null)
-        {
+    public void ShowZoomRectangle(Rect rect) {
+        if (this.rectangleAdorner != null) {
             rectangleAdorner.Rectangle = rect;
             return;
         }
 
-        if (this.hostPresenter is not UIElement visual)
-        {
+        if (this.hostPresenter is not UIElement visual) {
             return;
         }
 
         var myAdornerLayer = AdornerLayer.GetAdornerLayer(visual);
-        if (myAdornerLayer == null)
-        {
+        if (myAdornerLayer == null) {
             return;
         }
         this.rectangleAdorner = new RectangleAdorner(
@@ -1036,16 +925,14 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="speed">The speed.</param>
     /// <param name="position">The position.</param>
     /// <param name="aroundPoint">The point to spin around.</param>
-    public void StartSpin(Vector speed, Point position, Point3D aroundPoint)
-    {
+    public void StartSpin(Vector speed, Point position, Point3D aroundPoint) {
         cameraController.StartSpin(speed.ToVector2(), position, aroundPoint.ToVector3());
     }
 
     /// <summary>
     ///   Stops the spinning.
     /// </summary>
-    public void StopSpin()
-    {
+    public void StopSpin() {
         cameraController.StopSpin();
     }
 
@@ -1058,8 +945,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    public void ZoomExtents(Rect3D bounds, double animationTime = 0)
-    {
+    public void ZoomExtents(Rect3D bounds, double animationTime = 0) {
         ViewportExtensions.ZoomExtents(this, bounds, animationTime);
     }
 
@@ -1069,10 +955,8 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time (milliseconds). 
     /// </param>
-    public void ZoomExtents(double animationTime = 200)
-    {
-        if (!this.IsZoomEnabled)
-        {
+    public void ZoomExtents(double animationTime = 200) {
+        if (!this.IsZoomEnabled) {
             return;
         }
 
@@ -1083,48 +967,38 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Attaches the elements to the specified host.
     /// </summary>
     /// <param name="host">The host.</param>
-    public void Attach(IRenderHost host)
-    {
-        if (!IsAttached)
-        {
-            foreach (var e in this.OwnedRenderables)
-            {
+    public void Attach(IRenderHost host) {
+        if (!IsAttached) {
+            foreach (var e in this.OwnedRenderables) {
                 e.Attach(EffectsManager);
                 e.Invalidated += NodeInvalidated;
             }
             SharedModelContainerInternal?.Attach(host);
-            foreach (var e in this.D2DRenderables)
-            {
+            foreach (var e in this.D2DRenderables) {
                 e.Attach(host);
             }
             IsAttached = true;
         }
     }
 
-    private void NodeInvalidated(object? sender, InvalidateTypes e)
-    {
+    private void NodeInvalidated(object? sender, InvalidateTypes e) {
         renderHostInternal?.Invalidate(e);
     }
 
     /// <summary>
     /// Detaches the elements.
     /// </summary>
-    public void Detach()
-    {
-        if (IsAttached)
-        {
+    public void Detach() {
+        if (IsAttached) {
             IsAttached = false;
-            foreach (var e in this.OwnedRenderables)
-            {
+            foreach (var e in this.OwnedRenderables) {
                 e.Invalidated -= NodeInvalidated;
                 e.Detach();
             }
-            if (this.renderHostInternal is not null)
-            {
+            if (this.renderHostInternal is not null) {
                 SharedModelContainerInternal?.Detach(this.renderHostInternal);
             }
-            foreach (var e in this.D2DRenderables)
-            {
+            foreach (var e in this.D2DRenderables) {
                 e.Detach();
             }
         }
@@ -1137,8 +1011,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <returns>
     /// The pressed mouse buttons as flags of <see cref="MouseButton"/>.
     /// </returns>
-    public static MouseButton GetPressedMouseButtons()
-    {
+    public static MouseButton GetPressedMouseButtons() {
         var flags = 0;
         flags |= (int)Mouse.LeftButton << 20;
         flags |= (int)Mouse.RightButton << 21;
@@ -1149,18 +1022,15 @@ public partial class Viewport3DX : Control, IViewport3DX
     }
 
     /// <inheritdoc/>
-    protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
-    {
+    protected override void OnPreviewMouseDown(MouseButtonEventArgs e) {
         base.OnPreviewMouseDown(e);
-        if (this.touchDownDevice == null)
-        {
+        if (this.touchDownDevice == null) {
             this.Focus();
             this.MouseDownHitTest(e.GetPosition(this), e);
         }
     }
 
-    protected override void OnMouseDown(MouseButtonEventArgs e)
-    {
+    protected override void OnMouseDown(MouseButtonEventArgs e) {
         this.cameraController.OnMouseDown(e);
         base.OnMouseDown(e);
     }
@@ -1169,50 +1039,41 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <remarks>
     /// This makes selection via Touch work without disabling the CameraController which uses Manipulation.
     /// </remarks>>
-    protected override void OnTouchDown(TouchEventArgs e)
-    {
+    protected override void OnTouchDown(TouchEventArgs e) {
         base.OnTouchDown(e);
-        if (this.touchDownDevice == null)
-        {
+        if (this.touchDownDevice == null) {
             this.touchDownDevice = e.TouchDevice;
             this.Focus();
             this.MouseDownHitTest(e.GetTouchPoint(this).Position, e);
         }
     }
 
-    public void EmulateMouseDownByTouch(MouseButtonEventArgs e)
-    {
+    public void EmulateMouseDownByTouch(MouseButtonEventArgs e) {
         this.Focus();
         this.MouseDownHitTest(e.GetPosition(this), e);
     }
 
     /// <inheritdoc/>
-    protected override void OnMouseMove(MouseEventArgs e)
-    {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        if (this.touchDownDevice == null)
-        {
+        if (this.touchDownDevice == null) {
             var pt = e.GetPosition(this);
             this.MouseMoveHitTest(pt, e);
             this.UpdateCurrentPosition(pt);
         }
     }
 
-    private void Viewport3DX_FormMouseMove(object? sender, WinformHostExtend.FormMouseMoveEventArgs e)
-    {
-        if (this.touchDownDevice == null)
-        {
+    private void Viewport3DX_FormMouseMove(object? sender, WinformHostExtend.FormMouseMoveEventArgs e) {
+        if (this.touchDownDevice == null) {
             var pt = e.Location;
             this.MouseMoveHitTest(pt);
             this.UpdateCurrentPosition(pt);
         }
     }
     /// <inheritdoc/>
-    protected override void OnPreviewTouchMove(TouchEventArgs e)
-    {
+    protected override void OnPreviewTouchMove(TouchEventArgs e) {
         base.OnPreviewTouchMove(e);
-        if (this.touchDownDevice == e.TouchDevice)
-        {
+        if (this.touchDownDevice == e.TouchDevice) {
             var tp = e.GetTouchPoint(this);
             var pt = tp.Position;
             this.MouseMoveHitTest(pt, e);
@@ -1223,8 +1084,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Emulates the mouse move by touch.
     /// </summary>
     /// <param name="pt">The pt.</param>
-    public void EmulateMouseMoveByTouch(Point pt)
-    {
+    public void EmulateMouseMoveByTouch(Point pt) {
         this.MouseMoveHitTest(pt);
         this.UpdateCurrentPosition(pt);
     }
@@ -1233,74 +1093,62 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// Updates the property <see cref="CursorPosition"/>.
     /// </summary>
     /// <param name="pt">The current mouse hit point.</param>
-    private void UpdateCurrentPosition(Point pt)
-    {
-        if (this.EnableCursorPosition)
-        {
+    private void UpdateCurrentPosition(Point pt) {
+        if (this.EnableCursorPosition) {
             this.CursorOnElementPosition = this.FindNearestPoint(pt);
             this.CursorPosition = this.UnProjectOnPlane(pt);
         }
     }
 
     /// <inheritdoc/>
-    protected override void OnMouseUp(MouseButtonEventArgs e)
-    {
+    protected override void OnMouseUp(MouseButtonEventArgs e) {
         base.OnMouseUp(e);
         this.MouseUpHitTest(e.GetPosition(this), e);
     }
 
-    protected override void OnMouseWheel(MouseWheelEventArgs e)
-    {
+    protected override void OnMouseWheel(MouseWheelEventArgs e) {
         cameraController.OnMouseWheel(this, e);
         base.OnMouseWheel(e);
     }
 
-    private void Viewport3DX_FormMouseWheel(object? sender, WinformHostExtend.FormMouseWheelEventArgs e)
-    {
-        cameraController.OnMouseWheel(this, e);
+    private void Viewport3DX_FormMouseWheel(object? sender, WinformHostExtend.FormMouseWheelEventArgs e) {
+        cameraController.OnMouseWheel(this, e.Location, e.Delta, e);
+
         base.OnMouseWheel(e);
     }
     /// <inheritdoc/>
-    protected override void OnTouchUp(TouchEventArgs e)
-    {
+    protected override void OnTouchUp(TouchEventArgs e) {
         base.OnTouchUp(e);
-        if (this.touchDownDevice == e.TouchDevice)
-        {
+        if (this.touchDownDevice == e.TouchDevice) {
             this.touchDownDevice = null;
             this.MouseUpHitTest(e.GetTouchPoint(this).Position, e);
         }
     }
 
-    public void EmulateMouseUpByTouch(MouseButtonEventArgs e)
-    {
+    public void EmulateMouseUpByTouch(MouseButtonEventArgs e) {
         this.MouseUpHitTest(e.GetPosition(this), e);
     }
 
-    protected override void OnManipulationStarted(ManipulationStartedEventArgs e)
-    {
+    protected override void OnManipulationStarted(ManipulationStartedEventArgs e) {
         cameraController.OnManipulationStarted(e);
         base.OnManipulationStarted(e);
     }
 
-    protected override void OnManipulationDelta(ManipulationDeltaEventArgs e)
-    {
+    protected override void OnManipulationDelta(ManipulationDeltaEventArgs e) {
         cameraController.OnManipulationDelta(e);
         base.OnManipulationDelta(e);
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
-    {
+    protected override void OnKeyDown(KeyEventArgs e) {
         cameraController.OnKeyDown(e);
         base.OnKeyDown(e);
     }
 
     /// <inheritdoc/>
-    protected override void OnManipulationCompleted(ManipulationCompletedEventArgs e)
-    {
+    protected override void OnManipulationCompleted(ManipulationCompletedEventArgs e) {
         cameraController.OnManipulationCompleted(e);
         base.OnManipulationCompleted(e);
-        if (this.touchDownDevice != null)
-        {
+        if (this.touchDownDevice != null) {
             // If this.touchDownDevice has not come up for some reason, do it now.
             this.touchDownDevice = null;
             var pt = e.ManipulationOrigin + e.TotalManipulation.Translation;
@@ -1311,8 +1159,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Raises the camera changed event.
     /// </summary>
-    protected virtual void RaiseCameraChangedEvent()
-    {
+    protected virtual void RaiseCameraChangedEvent() {
         // e.Handled = true;
         var args = new RoutedEventArgs(CameraChangedEvent);
         this.RaiseEvent(args);
@@ -1330,10 +1177,8 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="animationTime">
     /// The animation time.
     /// </param>
-    private static void AnimateOpacity(UIElement obj, double toOpacity, double animationTime)
-    {
-        var a = new DoubleAnimation(toOpacity, new Duration(TimeSpan.FromMilliseconds(animationTime)))
-        {
+    private static void AnimateOpacity(UIElement obj, double toOpacity, double animationTime) {
+        var a = new DoubleAnimation(toOpacity, new Duration(TimeSpan.FromMilliseconds(animationTime))) {
             AccelerationRatio = 0.3,
             DecelerationRatio = 0.5
         };
@@ -1349,14 +1194,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void BackViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void BackViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(0, 0, 1), new Vector3D(0, 1, 0));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(1, 0, 0), new Vector3D(0, 0, 1));
         }
     }
@@ -1370,14 +1211,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void BottomViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void BottomViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(0, 1, 0), new Vector3D(0, 0, 1));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(0, 0, 1), new Vector3D(0, -1, 0));
         }
     }
@@ -1388,8 +1225,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <returns>
     ///   <c>true</c> if the up direction is (0,1,0); otherwise, <c>false</c>.
     /// </returns>
-    public bool IsModelUpDirectionY()
-    {
+    public bool IsModelUpDirectionY() {
         return this.ModelUpDirection.Y.Equals(1);
     }
 
@@ -1397,10 +1233,8 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Handles the change of the effects manager.
     /// </summary>
-    private void EffectsManagerPropertyChanged()
-    {
-        if (this.renderHostInternal != null)
-        {
+    private void EffectsManagerPropertyChanged() {
+        if (this.renderHostInternal != null) {
             this.renderHostInternal.EffectsManager = this.EffectsManager;
         }
     }
@@ -1408,10 +1242,8 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Handles the change of the render technique        
     /// </summary>
-    private void RenderTechniquePropertyChanged(IRenderTechnique technique)
-    {
-        if (this.renderHostInternal != null)
-        {
+    private void RenderTechniquePropertyChanged(IRenderTechnique technique) {
+        if (this.renderHostInternal != null) {
             this.renderHostInternal.RenderTechnique = technique;
         }
     }
@@ -1419,25 +1251,20 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Handles changes in the camera properties.
     /// </summary>
-    private void CameraPropertyChanged(DependencyPropertyChangedEventArgs e)
-    {
-        if (e.NewValue != e.OldValue)
-        {
-            if (CameraController.ActualCamera != null)
-            {
+    private void CameraPropertyChanged(DependencyPropertyChangedEventArgs e) {
+        if (e.NewValue != e.OldValue) {
+            if (CameraController.ActualCamera != null) {
                 CameraController.ActualCamera.CameraInternal.PropertyChanged -= CameraInternal_PropertyChanged;
             }
             CameraController.ActualCamera = e.NewValue == null ?
                 (Orthographic ? orthographicCamera : perspectiveCamera as Camera) : e.NewValue as Camera;
-            if (CameraController.ActualCamera != null)
-            {
+            if (CameraController.ActualCamera != null) {
                 CameraController.ActualCamera.CameraInternal.PropertyChanged += CameraInternal_PropertyChanged;
             }
         }
     }
 
-    private void CameraInternal_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
+    private void CameraInternal_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         InvalidateRender();
         // Raise notification
         this.RaiseCameraChangedEvent();
@@ -1458,15 +1285,12 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <returns>
     /// The clamp. 
     /// </returns>
-    private double Clamp(double value, double min, double max)
-    {
-        if (value < min)
-        {
+    private double Clamp(double value, double min, double max) {
+        if (value < min) {
             return min;
         }
 
-        if (value > max)
-        {
+        if (value > max) {
             return max;
         }
 
@@ -1482,12 +1306,9 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments.
     /// </param>
-    private void ControlLoaded(object? sender, RoutedEventArgs e)
-    {
-        if (!this.hasBeenLoadedBefore)
-        {
-            if (this.DefaultCamera != null)
-            {
+    private void ControlLoaded(object? sender, RoutedEventArgs e) {
+        if (!this.hasBeenLoadedBefore) {
+            if (this.DefaultCamera != null) {
                 this.DefaultCamera.CopyTo(this.perspectiveCamera);
                 this.DefaultCamera.CopyTo(this.orthographicCamera);
             }
@@ -1495,34 +1316,27 @@ public partial class Viewport3DX : Control, IViewport3DX
             this.hasBeenLoadedBefore = true;
         }
 
-        if (BelongsToParentWindow)
-        {
+        if (BelongsToParentWindow) {
             parentWindow = FindVisualAncestor<Window>(this);
-            if (parentWindow != null)
-            {
+            if (parentWindow != null) {
                 parentWindow.Closed += ParentWindow_Closed;
             }
         }
 
-        if (this.ZoomExtentsWhenLoaded)
-        {
-            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, new Action(() =>
-            {
+        if (this.ZoomExtentsWhenLoaded) {
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, new Action(() => {
                 this.ZoomExtents();
             }));
         }
-        if (EnableSwapChainRendering)
-        {
+        if (EnableSwapChainRendering) {
             FormMouseMove += Viewport3DX_FormMouseMove;
             FormMouseWheel += Viewport3DX_FormMouseWheel;
         }
     }
 
-    private void ParentWindow_Closed(object? sender, EventArgs e)
-    {
+    private void ParentWindow_Closed(object? sender, EventArgs e) {
         ControlUnloaded(sender, null);
-        if (hostPresenter?.Content is IDisposable d)
-        {
+        if (hostPresenter?.Content is IDisposable d) {
             hostPresenter.Content = null;
             d.Dispose();
         }
@@ -1537,12 +1351,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments.
     /// </param>
-    private void ControlUnloaded(object? sender, RoutedEventArgs? e)
-    {
+    private void ControlUnloaded(object? sender, RoutedEventArgs? e) {
         FormMouseMove -= Viewport3DX_FormMouseMove;
         FormMouseWheel -= Viewport3DX_FormMouseWheel;
-        if (BelongsToParentWindow && parentWindow != null)
-        {
+        if (BelongsToParentWindow && parentWindow != null) {
             parentWindow.Closed -= ParentWindow_Closed;
         }
     }
@@ -1556,14 +1368,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void FrontViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void FrontViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(0, 0, -1), new Vector3D(0, 1, 0));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(-1, 0, 0), new Vector3D(0, 0, 1));
         }
     }
@@ -1577,14 +1385,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void LeftViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void LeftViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(1, 0, 0), new Vector3D(0, 1, 0));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(0, 1, 0), new Vector3D(0, 0, 1));
         }
     }
@@ -1592,10 +1396,8 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// The rendering event handler.
     /// </summary>
-    private void OnCompositionTargetRendering()
-    {
-        if (renderHostInternal?.RenderStatistics is null)
-        {
+    private void OnCompositionTargetRendering() {
+        if (renderHostInternal?.RenderStatistics is null) {
             return;
         }
 
@@ -1605,8 +1407,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// </summary>
     /// <param name="timeStamp"></param>
-    public void Update(TimeSpan timeStamp)
-    {
+    public void Update(TimeSpan timeStamp) {
         OnCompositionTargetRendering();
         cameraController.OnCompositionTargetRendering(timeStamp.Ticks);
     }
@@ -1614,20 +1415,15 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Called when the camera type is changed.
     /// </summary>
-    private void OrthographicChanged()
-    {
+    private void OrthographicChanged() {
         var oldCamera = this.Camera;
-        if (this.Orthographic)
-        {
+        if (this.Orthographic) {
             this.Camera = this.orthographicCamera;
-        }
-        else
-        {
+        } else {
             this.Camera = this.perspectiveCamera;
         }
 
-        if (oldCamera is IProjectionCameraModel projectionCamera)
-        {
+        if (oldCamera is IProjectionCameraModel projectionCamera) {
             projectionCamera.CopyTo(this.Camera);
         }
     }
@@ -1637,11 +1433,9 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// </summary>
     /// <param name="sender">The event source.</param>
     /// <param name="e">The event arguments.</param>
-    private void HandleRenderException(object? sender, RelayExceptionEventArgs e)
-    {
+    private void HandleRenderException(object? sender, RelayExceptionEventArgs e) {
         var bindingExpression = this.GetBindingExpression(RenderExceptionProperty);
-        if (bindingExpression != null)
-        {
+        if (bindingExpression != null) {
             // If RenderExceptionProperty is bound, we assume the exception will be handled.
             this.RenderException = e.Exception;
             e.Handled = true;
@@ -1651,15 +1445,13 @@ public partial class Viewport3DX : Control, IViewport3DX
         this.RenderExceptionOccurred(sender, e);
 
         // If the Exception is still unhandled...
-        if (!e.Handled)
-        {
+        if (!e.Handled) {
             // ... prevent a MessageBox.Show().
             this.MessageText = e.Exception.ToString();
             e.Handled = true;
         }
 
-        if (hostPresenter is not null)
-        {
+        if (hostPresenter is not null) {
             hostPresenter.Content = null;
         }
 
@@ -1671,8 +1463,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// </summary>
     /// <param name="sender">The sender.</param>
     /// <param name="e">The <see cref="ExecutedRoutedEventArgs" /> instance containing the event data.</param>
-    private void ResetHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
+    private void ResetHandler(object? sender, ExecutedRoutedEventArgs e) {
         this.Reset();
     }
 
@@ -1685,14 +1476,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void RightViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void RightViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(-1, 0, 0), new Vector3D(0, 1, 0));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(0, -1, 0), new Vector3D(0, 0, 1));
         }
     }
@@ -1700,8 +1487,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// Sets the default gestures.
     /// </summary>
-    private void SetDefaultGestures()
-    {
+    private void SetDefaultGestures() {
         this.InputBindings.Clear();
 
         // Set Default Key Gestures:
@@ -1755,14 +1541,10 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="e">
     /// The event arguments. 
     /// </param>
-    private void TopViewHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
-        if (this.IsModelUpDirectionY())
-        {
+    private void TopViewHandler(object? sender, ExecutedRoutedEventArgs e) {
+        if (this.IsModelUpDirectionY()) {
             this.ChangeDirection(new Vector3D(0, -1, 0), new Vector3D(0, 0, 1));
-        }
-        else
-        {
+        } else {
             this.ChangeDirection(new Vector3D(0, 0, -1), new Vector3D(0, 1, 0));
         }
     }
@@ -1770,22 +1552,16 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <summary>
     /// The UseDefaultGestures property changed.
     /// </summary>
-    private void UseDefaultGesturesChanged()
-    {
-        if (this.UseDefaultGestures)
-        {
+    private void UseDefaultGesturesChanged() {
+        if (this.UseDefaultGestures) {
             this.SetDefaultGestures();
-        }
-        else
-        {
+        } else {
             this.InputBindings.Clear();
         }
     }
 
-    private void ViewCubeClicked(Vector3D lookDirection, Vector3D upDirection)
-    {
-        if (cameraController.ActualCamera is null)
-        {
+    private void ViewCubeClicked(Vector3D lookDirection, Vector3D upDirection) {
+        if (cameraController.ActualCamera is null) {
             return;
         }
 
@@ -1801,8 +1577,7 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// </summary>
     /// <param name="sender">The sender.</param>
     /// <param name="e">The <see cref="ExecutedRoutedEventArgs" /> instance containing the event data.</param>
-    private void ZoomExtentsHandler(object? sender, ExecutedRoutedEventArgs e)
-    {
+    private void ZoomExtentsHandler(object? sender, ExecutedRoutedEventArgs e) {
         this.ZoomExtents();
     }
 
@@ -1812,8 +1587,7 @@ public partial class Viewport3DX : Control, IViewport3DX
         return this.FindHitsInFrustum(e.GetCurrentPoint(this).Position.ToVector2(), ref hits);
     }
 #else
-    public bool HittedSomething(MouseEventArgs e)
-    {
+    public bool HittedSomething(MouseEventArgs e) {
         return this.FindHitsInFrustum(e.GetPosition(this).ToVector2(), ref hits);
     }
 #endif
@@ -1825,93 +1599,70 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="originalInputEventArgs">
     /// The original input event (which mouse button pressed?)
     /// </param>
-    private void MouseDownHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null)
-    {
-        if (Overlay2D.HitTest(pt.ToVector2(), out currentHit2D))
-        {
-            if (currentHit2D?.ModelHit is Element2D e)
-            {
+    private void MouseDownHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null) {
+        if (Overlay2D.HitTest(pt.ToVector2(), out currentHit2D)) {
+            if (currentHit2D?.ModelHit is Element2D e) {
                 e.RaiseEvent(new Mouse2DEventArgs(Element2D.MouseDown2DEvent, currentHit2D.ModelHit, currentHit2D, pt, this, originalInputEventArgs));
 
-                if (originalInputEventArgs is not null)
-                {
+                if (originalInputEventArgs is not null) {
                     originalInputEventArgs.Handled = true;
                 }
             }
             return;
         }
-        if (ViewBoxHitTest(pt, originalInputEventArgs))
-        {
-            if (originalInputEventArgs is not null)
-            {
+        if (ViewBoxHitTest(pt, originalInputEventArgs)) {
+            if (originalInputEventArgs is not null) {
                 originalInputEventArgs.Handled = true;
             }
             return;
         }
 
-        if (!enableMouseButtonHitTest)
-        {
+        if (!enableMouseButtonHitTest) {
             return;
         }
 
-        if (this.FindHits(pt.ToVector2(), ref hits))
-        {
+        if (this.FindHits(pt.ToVector2(), ref hits)) {
             // We can't capture Touch because that would disable the CameraController which uses Manipulation,
             // but since Manipulation captures touch, we can be quite sure to get every relevant touch event.
-            if (this.touchDownDevice == null)
-            {
+            if (this.touchDownDevice == null) {
                 Mouse.Capture(this, CaptureMode.SubTree);
             }
 
             this.currentHit = hits.FirstOrDefault(x => x.IsValid);
-            if (this.currentHit != null)
-            {
-                if (currentHit.ModelHit is Element3D ele)
-                {
+            if (this.currentHit != null) {
+                if (currentHit.ModelHit is Element3D ele) {
                     ele.RaiseEvent(new MouseDown3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
-                }
-                else if (currentHit.ModelHit is SceneNode sceneNode)
-                {
+                } else if (currentHit.ModelHit is SceneNode sceneNode) {
                     sceneNode.RaiseMouseDownEvent(this, pt.ToVector2(), currentHit, originalInputEventArgs);
                     RaiseEvent(new MouseDown3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
                 }
             }
-        }
-        else
-        {
+        } else {
             currentHit = null;
             // Raise event from Viewport3DX if there's no hit
             this.RaiseEvent(new MouseDown3DEventArgs(this, null, pt, this, originalInputEventArgs));
         }
     }
 
-    private bool ViewBoxHitTest(Point p, InputEventArgs? originalInputEventArgs = null)
-    {
-        if (RenderContext is null || viewCube is null)
-        {
+    private bool ViewBoxHitTest(Point p, InputEventArgs? originalInputEventArgs = null) {
+        if (RenderContext is null || viewCube is null) {
             return false;
         }
 
         var ray = this.UnProject(p.ToVector2());
         var hits = new List<HitTestResult>();
         var hitContext = new HitTestContext(RenderContext, ray, p.ToVector2());
-        if (viewCube.HitTest(hitContext, ref hits))
-        {
+        if (viewCube.HitTest(hitContext, ref hits)) {
             viewCube.RaiseEvent(new MouseDown3DEventArgs(viewCube, this.currentHit, p, this, originalInputEventArgs));
             var normal = hits[0].NormalAtHit;
-            if (Vector3.Cross(normal, ModelUpDirection.ToVector3()).LengthSquared() < 1e-5)
-            {
+            if (Vector3.Cross(normal, ModelUpDirection.ToVector3()).LengthSquared() < 1e-5) {
                 var vecLeft = new Vector3(-normal.Y, -normal.Z, -normal.X);
                 ViewCubeClicked(hits[0].NormalAtHit.ToVector3D(), vecLeft.ToVector3D());
-            }
-            else
-            {
+            } else {
                 ViewCubeClicked(hits[0].NormalAtHit.ToVector3D(), ModelUpDirection);
             }
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -1923,42 +1674,30 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="originalInputEventArgs">
     /// The original input (which mouse button pressed?)
     /// </param>
-    private void MouseMoveHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null)
-    {
-        if (Overlay2D.HitTest(pt.ToVector2(), out var hit2D))
-        {
-            if (hit2D?.ModelHit is Element2D e)
-            {
+    private void MouseMoveHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null) {
+        if (Overlay2D.HitTest(pt.ToVector2(), out var hit2D)) {
+            if (hit2D?.ModelHit is Element2D e) {
                 MouseOverModel2D = e;
                 e.RaiseEvent(new Mouse2DEventArgs(Element2D.MouseMove2DEvent, hit2D.ModelHit, hit2D, pt, this, originalInputEventArgs));
                 //Debug.WriteLine("hit 2D, name="+e.Name);
             }
             return;
-        }
-        else
-        {
+        } else {
             MouseOverModel2D = null;
         }
 
-        if (!enableMouseButtonHitTest)
-        {
+        if (!enableMouseButtonHitTest) {
             return;
         }
 
-        if (this.currentHit != null)
-        {
-            if (currentHit.ModelHit is Element3D ele)
-            {
+        if (this.currentHit != null) {
+            if (currentHit.ModelHit is Element3D ele) {
                 ele.RaiseEvent(new MouseMove3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
-            }
-            else if (currentHit.ModelHit is SceneNode sceneNode)
-            {
+            } else if (currentHit.ModelHit is SceneNode sceneNode) {
                 sceneNode.RaiseMouseMoveEvent(this, pt.ToVector2(), currentHit, originalInputEventArgs);
                 RaiseEvent(new MouseMove3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
             }
-        }
-        else
-        {
+        } else {
             // Raise event from Viewport3DX if there's no hit
             this.RaiseEvent(new MouseMove3DEventArgs(this, null, pt, this, originalInputEventArgs));
         }
@@ -1971,59 +1710,44 @@ public partial class Viewport3DX : Control, IViewport3DX
     /// <param name="originalInputEventArgs">
     /// The original input event (which mouse button pressed?)
     /// </param>
-    private void MouseUpHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null)
-    {
-        if (!enableMouseButtonHitTest)
-        {
+    private void MouseUpHitTest(Point pt, UIInputEventArgs? originalInputEventArgs = null) {
+        if (!enableMouseButtonHitTest) {
             return;
         }
 
-        if (this.currentHit2D != null)
-        {
-            if (this.currentHit2D.ModelHit is Element2D element)
-            {
+        if (this.currentHit2D != null) {
+            if (this.currentHit2D.ModelHit is Element2D element) {
                 element.RaiseEvent(new Mouse2DEventArgs(Element2D.MouseUp2DEvent, currentHit2D.ModelHit, currentHit2D, pt, this, originalInputEventArgs));
             }
             this.currentHit2D = null;
         }
 
-        if (this.currentHit != null)
-        {
-            if (this.currentHit.ModelHit is Element3D ele)
-            {
+        if (this.currentHit != null) {
+            if (this.currentHit.ModelHit is Element3D ele) {
                 ele.RaiseEvent(new MouseUp3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
-            }
-            else if (this.currentHit.ModelHit is SceneNode sceneNode)
-            {
+            } else if (this.currentHit.ModelHit is SceneNode sceneNode) {
                 sceneNode.RaiseMouseUpEvent(this, pt.ToVector2(), currentHit, originalInputEventArgs);
                 RaiseEvent(new MouseUp3DEventArgs(this.currentHit.ModelHit, this.currentHit, pt, this, originalInputEventArgs));
             }
 
             this.currentHit = null;
             Mouse.Capture(this, CaptureMode.None);
-        }
-        else
-        {
+        } else {
             // Raise event from Viewport3DX if there's no hit
             this.RaiseEvent(new MouseUp3DEventArgs(this, null, pt, this, originalInputEventArgs));
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void RaiseRenderHostRendered(object? sender, EventArgs e)
-    {
+    private void RaiseRenderHostRendered(object? sender, EventArgs e) {
         this.OnRendered?.Invoke(sender, e);
     }
 
-    public static T? FindVisualAncestor<T>(DependencyObject obj) where T : DependencyObject
-    {
-        if (obj != null)
-        {
+    public static T? FindVisualAncestor<T>(DependencyObject obj) where T : DependencyObject {
+        if (obj != null) {
             var parent = VisualTreeHelper.GetParent(obj);
-            while (parent != null)
-            {
-                if (parent is T typed)
-                {
+            while (parent != null) {
+                if (parent is T typed) {
                     return typed;
                 }
 
@@ -2034,12 +1758,9 @@ public partial class Viewport3DX : Control, IViewport3DX
         return null;
     }
 
-    protected override Size MeasureOverride(Size constraint)
-    {
-        if (double.IsInfinity(constraint.Width) && double.IsInfinity(constraint.Height))
-        {
-            if ((_ = FindVisualAncestor<Viewbox>(this)) != null)
-            {
+    protected override Size MeasureOverride(Size constraint) {
+        if (double.IsInfinity(constraint.Width) && double.IsInfinity(constraint.Height)) {
+            if ((_ = FindVisualAncestor<Viewbox>(this)) != null) {
                 MessageText = "Must specify Width and Height for Viewport3DX in a ViewBox";
                 return base.MeasureOverride(new Size(600, 400));
             }
@@ -2050,16 +1771,11 @@ public partial class Viewport3DX : Control, IViewport3DX
 
     private bool disposedValue = false; // To detect redundant calls
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                if (!BelongsToParentWindow)
-                {
-                    if (hostPresenter?.Content is IDisposable d)
-                    {
+    protected virtual void Dispose(bool disposing) {
+        if (!disposedValue) {
+            if (disposing) {
+                if (!BelongsToParentWindow) {
+                    if (hostPresenter?.Content is IDisposable d) {
                         hostPresenter.Content = null;
                         d.Dispose();
                     }
@@ -2067,8 +1783,7 @@ public partial class Viewport3DX : Control, IViewport3DX
                     Camera = null;
                     EffectsManager = null;
 
-                    foreach (Element3D item in Items)
-                    {
+                    foreach (Element3D item in Items) {
                         item.Dispose();
                     }
 
@@ -2085,8 +1800,7 @@ public partial class Viewport3DX : Control, IViewport3DX
         }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         Dispose(disposing: true);
     }
 }
