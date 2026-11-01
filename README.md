@@ -134,21 +134,26 @@ Please use the following template to report bugs.
 - Reproduce Steps:
 - Sample Code:
 
+## What's next?
+
+We are currently developing the [next generation helix toolkit engine](https://github.com/helix-toolkit/helix-toolkit-nex) based on vulkun with modern 3D engine architecture. You can provide feature requests [here](https://github.com/helix-toolkit/helix-toolkit-nex/discussions/6).
+
 ## News
-#### 2025-11-10
-[v3.1.1](https://github.com/helix-toolkit/helix-toolkit/releases/tag/v3.1.1) releases are available on nuget. [Release Note](/CHANGELOG.md)
+
+#### 2025-11-25
+[v3.1.2](https://github.com/helix-toolkit/helix-toolkit/releases/tag/v3.1.2) releases are available on nuget. [Release Note](/CHANGELOG.md)
 
 :bangbang: HelixToolkit v2 is in maintainance mode (Will only release new version on critical bug fixes). Moving forward, our focus will shift to the development of v3.
 
-- [HelixToolkit.Maths](https://www.nuget.org/packages/HelixToolkit.Maths/3.1.1)
-- [HelixToolkit.Geometry](https://www.nuget.org/packages/HelixToolkit.Geometry/3.1.1)
-- [HelixToolkit.SharpDX](https://www.nuget.org/packages/HelixToolkit.SharpDX/3.1.1)
-- [HelixToolkit.WPF.SharpDX](https://www.nuget.org/packages/HelixToolkit.Wpf.SharpDX/3.1.1)
-- [HelixToolkit.WinUI.SharpDX](https://www.nuget.org/packages/HelixToolkit.WinUI.SharpDX/3.1.1)
-- [HelixToolkit.Avalonia.SharpDX](https://www.nuget.org/packages/HelixToolkit.Avalonia.SharpDX/3.1.1)
-- [HelixToolkit.SharpDX.Assimp](https://www.nuget.org/packages/HelixToolkit.SharpDX.Assimp/3.1.1)
-- [HelixToolkit.WPF](https://www.nuget.org/packages/HelixToolkit.Wpf/3.1.1)
-- [HelixToolkit.Wpf.TDxInput](https://www.nuget.org/packages/HelixToolkit.Wpf.TDxInput/3.1.1)
+- [HelixToolkit.Maths](https://www.nuget.org/packages/HelixToolkit.Maths/3.1.2)
+- [HelixToolkit.Geometry](https://www.nuget.org/packages/HelixToolkit.Geometry/3.1.2)
+- [HelixToolkit.SharpDX](https://www.nuget.org/packages/HelixToolkit.SharpDX/3.1.2)
+- [HelixToolkit.WPF.SharpDX](https://www.nuget.org/packages/HelixToolkit.Wpf.SharpDX/3.1.2)
+- [HelixToolkit.WinUI.SharpDX](https://www.nuget.org/packages/HelixToolkit.WinUI.SharpDX/3.1.2)
+- [HelixToolkit.Avalonia.SharpDX](https://www.nuget.org/packages/HelixToolkit.Avalonia.SharpDX/3.1.2)
+- [HelixToolkit.SharpDX.Assimp](https://www.nuget.org/packages/HelixToolkit.SharpDX.Assimp/3.1.2)
+- [HelixToolkit.WPF](https://www.nuget.org/packages/HelixToolkit.Wpf/3.1.2)
+- [HelixToolkit.Wpf.TDxInput](https://www.nuget.org/packages/HelixToolkit.Wpf.TDxInput/3.1.2)
 - 
 #### Changes (Please refer to [Release Note](https://github.com/helix-toolkit/helix-toolkit/blob/master/CHANGELOG.md) for details)
 
@@ -156,7 +161,11 @@ Please use the following template to report bugs.
 Nightly build myget feed link has been updated to: https://www.myget.org/F/helixtoolkit-nightly
 
 
+## Samples
 
-
+![ModelLoader](https://github.com/helix-toolkit/helix-toolkit.github.io/blob/master/assets/HelixToolkit/SharpDX/PBRHelmet.PNG)
+![PostEffects](https://github.com/helix-toolkit/helix-toolkit.github.io/blob/master/assets/HelixToolkit/SharpDX/PostEffects.PNG)
+![BoneSkinning](https://github.com/helix-toolkit/helix-toolkit.github.io/blob/master/assets/HelixToolkit/SharpDX/SkeletonAnimation.PNG)
+![VolumeRendering](https://github.com/helix-toolkit/helix-toolkit.github.io/blob/master/assets/HelixToolkit/SharpDX/VolumeRendering.png)
 
 

@@ -41,6 +41,9 @@ internal sealed class D3DRenderHost : DefaultRenderHost
         base.OnStartD3D();
         Initialize().Wait();
         _parent.PropertyChanged += ParentPropertyChanged;
+        // Start the render loop after initialization is complete.
+        // This ensures the first frame is queued even if Bounds have not changed.
+        QueueNextFrame();
     }
 
     protected override void OnEndingD3D()
@@ -51,14 +54,47 @@ internal sealed class D3DRenderHost : DefaultRenderHost
             FreeGraphicsResources();
         }
         _initialized = false;
+        _updateQueued = false; // Reset so QueueNextFrame can re-register on reattach.
+        ReleaseCompositionResources();
         base.OnEndingD3D();
+    }
+
+    private void ReleaseCompositionResources()
+    {
+        if (!global::Avalonia.Threading.Dispatcher.UIThread.CheckAccess())
+        {
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ReleaseCompositionResources);
+            return;
+        }
+
+        // Deterministically tear down the composition objects instead of leaking them
+        // to the GC. A leaked CompositionDrawingSurface leaves its server-side surface
+        // snapshot to Avalonia's Ref<T> critical finalizer, which then performs GPU
+        // cleanup (context MakeCurrent + native SKImage dispose) on the .NET finalizer
+        // thread, racing the compositor render loop (AvaloniaUI/Avalonia#21865).
+        ElementComposition.SetElementChildVisual(_parent, null);
+        if (_visual is not null)
+        {
+            _visual.Surface = null;
+            _visual = null;
+        }
+        Surface?.Dispose();
+        Surface = null;
+        _compositor = null;
     }
 
     private async Task Initialize()
     {
         try
         {
-            var selfVisual = ElementComposition.GetElementVisual(_parent)!;
+            var selfVisual = ElementComposition.GetElementVisual(_parent);
+            if (selfVisual is null)
+            {
+                _info = "Parent visual is not attached to compositor";
+                _initialized = false;
+                return;
+            }
+
             _compositor = selfVisual.Compositor;
 
             Surface = _compositor.CreateDrawingSurface();
@@ -75,6 +111,7 @@ internal sealed class D3DRenderHost : DefaultRenderHost
         catch (Exception e)
         {
             _info = e.ToString();
+            _initialized = false;
         }
     }
 
@@ -97,11 +134,11 @@ internal sealed class D3DRenderHost : DefaultRenderHost
     {
         _updateQueued = false;
         var root = _parent.GetVisualRoot();
-        if (root == null)
+        if (root == null || _visual is null)
             return;
 
         Rect bounds = _parent.Bounds;
-        _visual!.Size = new(bounds.Width, bounds.Height);
+        _visual.Size = new(bounds.Width, bounds.Height);
         //_pixelSize = PixelSize.FromSize(bounds.Size, root.RenderScaling);
         _pixelSize = PixelSize.FromSize(bounds.Size, 1.0);
         Resize(_pixelSize.Width, _pixelSize.Height);
@@ -138,7 +175,7 @@ internal sealed class D3DRenderHost : DefaultRenderHost
 
         if (EffectsManager is null || EffectsManager.Device is null)
         {
-            return (true, string.Empty);
+            return (false, "EffectsManager or Device is null");
         }
 
         _device = EffectsManager.Device;
